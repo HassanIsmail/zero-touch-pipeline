@@ -1,4 +1,4 @@
-# Requirements — Simple Todo App
+# Requirements â Simple Todo App
 
 ## What to build
 A single-page web application that lets a user manage a todo list.
@@ -11,7 +11,7 @@ A single-page web application that lets a user manage a todo list.
 - Persist todos in localStorage so they survive a page refresh
 
 ## Tech
-- Plain HTML, CSS, JavaScript — no framework required
+- Plain HTML, CSS, JavaScript â no framework required
 - Single file output preferred (index.html)
 - Must work in Chrome without any build step
 

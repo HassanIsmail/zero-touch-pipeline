@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo App</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 16px;
+      color: #1a1a2e;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #1a1a2e;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+
+    .add-form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .add-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1rem;
+      background: #fff;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .add-input:focus {
+      border-color: #6366f1;
+    }
+
+    .add-btn {
+      padding: 12px 20px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .add-btn:hover { background: #4f46e5; }
+    .add-btn:active { transform: scale(0.97); }
+
+    .summary {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 12px;
+      height: 20px;
+    }
+
+    .todo-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fff;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 12px 14px;
+      transition: border-color 0.2s, opacity 0.2s;
+    }
+
+    .todo-item.done {
+      opacity: 0.6;
+      border-color: #d1fae5;
+      background: #f0fdf4;
+    }
+
+    .check-btn {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border-radius: 50%;
+      border: 2px solid #d1d5db;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+      padding: 0;
+    }
+
+    .check-btn:hover { border-color: #6366f1; }
+
+    .todo-item.done .check-btn {
+      background: #22c55e;
+      border-color: #22c55e;
+    }
+
+    .check-icon {
+      display: none;
+      width: 12px;
+      height: 12px;
+      stroke: #fff;
+      stroke-width: 3;
+      fill: none;
+    }
+
+    .todo-item.done .check-icon { display: block; }
+
+    .todo-text {
+      flex: 1;
+      font-size: 1rem;
+      word-break: break-word;
+      line-height: 1.4;
+      transition: text-decoration 0.2s, color 0.2s;
+    }
+
+    .todo-item.done .todo-text {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+
+    .delete-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .delete-btn:hover { color: #ef4444; background: #fef2f2; }
+
+    .empty-state {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.95rem;
+      padding: 40px 0;
+    }
+
+    .empty-state svg {
+      display: block;
+      margin: 0 auto 12px;
+      opacity: 0.4;
+    }
+
+    @media (max-width: 400px) {
+      h1 { font-size: 1.6rem; }
+      .add-btn { padding: 12px 14px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Todo App</h1>
+    <p class="subtitle" id="summary">0 items remaining</p>
+
+    <form class="add-form" id="addForm">
+      <input
+        class="add-input"
+        id="todoInput"
+        type="text"
+        placeholder="What needs to be done?"
+        autocomplete="off"
+        maxlength="200"
+      />
+      <button class="add-btn" type="submit">Add</button>
+    </form>
+
+    <ul class="todo-list" id="todoList"></ul>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'zt_todos';
+
+    let todos = load();
+
+    function load() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    }
+
+    function render() {
+      const list = document.getElementById('todoList');
+      const summary = document.getElementById('summary');
+      const remaining = todos.filter(t => !t.done).length;
+
+      summary.textContent = remaining === 1
+        ? '1 item remaining'
+        : `${remaining} item${remaining === 0 && todos.length === 0 ? 's' : 's'} remaining`;
+
+      list.innerHTML = '';
+
+      if (todos.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1"/>
+              <path d="M9 12h6M9 16h4"/>
+            </svg>
+            No todos yet — add one above!
+          </div>`;
+        return;
+      }
+
+      todos.forEach((todo, index) => {
+        const li = document.createElement('li');
+        li.className = 'todo-item' + (todo.done ? ' done' : '');
+        li.setAttribute('data-index', index);
+
+        li.innerHTML = `
+          <button class="check-btn" aria-label="${todo.done ? 'Mark incomplete' : 'Mark complete'}" data-action="toggle">
+            <svg class="check-icon" viewBox="0 0 12 12">
+              <polyline points="1.5,6 4.5,9.5 10.5,2.5"/>
+            </svg>
+          </button>
+          <span class="todo-text">${escapeHtml(todo.text)}</span>
+          <button class="delete-btn" aria-label="Delete todo" data-action="delete">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+            </svg>
+          </button>`;
+
+        list.appendChild(li);
+      });
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.appendChild(document.createTextNode(str));
+      return d.innerHTML;
+    }
+
+    document.getElementById('addForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const input = document.getElementById('todoInput');
+      const text = input.value.trim();
+      if (!text) return;
+      todos.push({ text, done: false });
+      save();
+      render();
+      input.value = '';
+      input.focus();
+    });
+
+    document.getElementById('todoList').addEventListener('click', function (e) {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const li = btn.closest('[data-index]');
+      if (!li) return;
+      const index = parseInt(li.getAttribute('data-index'), 10);
+
+      if (btn.dataset.action === 'toggle') {
+        todos[index].done = !todos[index].done;
+      } else if (btn.dataset.action === 'delete') {
+        todos.splice(index, 1);
+      }
+      save();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
