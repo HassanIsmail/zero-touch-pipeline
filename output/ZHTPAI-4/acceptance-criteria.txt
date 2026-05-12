@@ -1,0 +1,3 @@
+All 5 features work correctly
+No console errors on load or interaction
+Page is usable on a mobile screen (375px wide)
