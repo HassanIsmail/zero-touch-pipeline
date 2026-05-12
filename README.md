@@ -1,4 +1,4 @@
-# Zero Human Touch Pipeline
+# Zero Touch Pipeline
 
 A fully automated, end-to-end software delivery pipeline. It polls Jira for stories labelled `ai-ready`, builds a complete web application using Claude AI, runs automated tests, opens a GitHub PR, deploys to Vercel, runs Playwright QA, emails the report, and closes the Jira story — all without human intervention.
 
@@ -150,7 +150,7 @@ The `requirements.md` attachment is what Claude reads to build the application. 
 ## Project Structure
 
 ```
-Zero-Human-Touch-Pipeline/
+zero-touch-pipeline/
 ├── main.py                  # Entry point — orchestrator + scheduler
 ├── requirements.txt         # Python dependencies
 ├── setup.sh                 # One-shot environment setup script
