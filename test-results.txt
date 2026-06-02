@@ -8,12 +8,12 @@ Attempts: 1
 PASS tests/app.test.js
   ✓ All 5 features work correctly (23 ms)
   ✓ No console errors on load or interaction (7 ms)
-  ✓ Page is usable on a mobile screen (375px wide) (8 ms)
+  ✓ Page is usable on a mobile screen (375px wide) (5 ms)
 
 Test Suites: 1 passed, 1 total
 Tests:       3 passed, 3 total
 Snapshots:   0 total
-Time:        0.459 s, estimated 1 s
+Time:        0.442 s, estimated 1 s
 Ran all test suites.
 Test results written to: test-run-raw.json
 Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?
